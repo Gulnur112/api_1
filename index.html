@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Meal Search API</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      padding: 40px;
+      background-color: #fffaf0;
+    }
+
+    input {
+      padding: 10px;
+      font-size: 16px;
+      width: 240px;
+      border: 1px solid #aaa;
+    }
+
+    button {
+      padding: 10px 16px;
+      background-color: #ffefd5;
+      border: 1px solid #f2eded;
+      cursor: pointer;
+      font-size: 16px;
+    }
+
+    .info {
+      margin-top: 30px;
+      background-color: #f9f9dc;
+      padding: 20px;
+      width: 320px;
+      border: 1px solid #ccc;
+    }
+
+    .info img {
+      width: 100%;
+      height: auto;
+    }
+
+    .info h2 {
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Search Your Meal</h1>
+
+  <input type="text" id="meal-name" placeholder="Enter meal name (e.g. pasta)">
+  <button id="search-btn">Search</button>
+
+  <div class="info"></div>
+
+  <script>
+    const btn = document.getElementById('search-btn');
+
+    async function getMeal(meal) {
+      const infoDiv = document.querySelector('.info');
+      infoDiv.innerHTML = "<p>Loading...</p>";
+
+      try {
+        const response = await fetch(`https://www.themealdb.com/api/json/v1/1/search.php?s=${meal}`);
+        const data = await response.json();
+
+        if (!data.meals) {
+          infoDiv.innerHTML = `<p>No meal found with the name "${meal}".</p>`;
+          return;
+        }
+
+        const mealData = data.meals[0];
+
+        infoDiv.innerHTML = `
+          <h2>${mealData.strMeal}</h2>
+          <img src="${mealData.strMealThumb}" alt="Meal image">
+          <p><strong>Category:</strong> ${mealData.strCategory}</p>
+          <p><strong>Area:</strong> ${mealData.strArea}</p>
+          <p><strong>Instructions:</strong> ${mealData.strInstructions.slice(0, 150)}...</p>
+        `;
+      } catch (error) {
+        infoDiv.innerHTML = "<p>Error loading data. Try again.</p>";
+      }
+    }
+
+    btn.addEventListener('click', function () {
+      const meal = document.getElementById('meal-name').value.trim();
+      if (meal !== "") {
+        getMeal(meal);
+      }
+    });
+  </script>
+
+</body>
+</html>
